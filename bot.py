@@ -79,11 +79,19 @@ async def send(ctx, member: discord.Member, amount: int):
     else:
         await ctx.reply("Insufficient GlumboCoin!")
 
+user_locks = {}
+
 @bot.command()
 async def websurf(ctx):
     """Surf the web to earn GlumboCoin! E.g .websurf""" 
     user_id = ctx.message.author.id
     await acc_check(user_id)
+
+    if user_id in user_locks and user_locks[user_id]:
+        await ctx.reply("You're already surfing the web! Please wait for the current process to finish.")
+        return
+    
+    user_locks[user_id] = True
 
     curr_time = int(time.time())
 
@@ -106,6 +114,8 @@ async def websurf(ctx):
         con.commit()
     else:
         await ctx.reply(f"Please wait another {1800 - (curr_time - last_time)} seconds!")
+
+    user_locks[user_id] = False
 
 token = os.getenv("DISCORD_TOKEN")
 bot.run(token)
