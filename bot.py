@@ -28,7 +28,6 @@ async def on_ready():
     print("Connected to GlumboCorp database")
     print('------')
 
-
 async def log_transaction(user_id_1:int, user_id_2:int, amount:int):
     timestamp = int(time.time())
     transaction_id = f"{user_id_1 + user_id_2 + timestamp}"
@@ -56,7 +55,7 @@ async def bal(ctx, member: discord.Member = None):
 
     cur.execute("SELECT balance FROM users WHERE user_id = ?;", (user_id,))
     balance = cur.fetchone()[0]
-    await ctx.reply(f"<@{user_id}>'s balance is: **{balance}**")
+    await ctx.reply(f"<@{user_id}>'s balance is: **{balance} GlumboCoin**")
 
 @bot.command()
 async def send(ctx, member: discord.Member, amount: int):
@@ -75,10 +74,10 @@ async def send(ctx, member: discord.Member, amount: int):
         cur.execute("UPDATE users SET balance = balance + ?, total_transactions = total_transactions + 1 WHERE user_id = ?;", (amount, recip_id))
         con.commit()
         await log_transaction(user_id, recip_id, amount)
-        await ctx.reply(f"Sent {amount} GlumboCoins to <@{recip_id}>!")
+        await ctx.reply(f"Sent **{amount} GlumboCoin** to <@{recip_id}>!")
 
     else:
-        await ctx.reply("Insufficient GlumboCoins!")
+        await ctx.reply("Insufficient GlumboCoin!")
 
 @bot.command()
 async def websurf(ctx):
@@ -96,6 +95,7 @@ async def websurf(ctx):
     if (curr_time - last_time) >= 1800:
         await ctx.reply("Surfing the web for GlumboCoins! \n https://tenor.com/view/surf-internet-gif-11385820")
         cur.execute("UPDATE users SET time_of_last_tx = ? WHERE user_id = ?;", (curr_time, user_id))
+        con.commit()
 
         msg = await ctx.send("# .")
         for i in range(1, 6):
