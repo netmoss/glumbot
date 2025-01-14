@@ -47,6 +47,7 @@ async def acc_check(user_id: int):
 
 @bot.command()
 async def bal(ctx, member: discord.Member = None):
+    """Check a balance! E.g .bal or .bal @<USER>""" 
     if member is None:
         member = ctx.author
 
@@ -59,6 +60,7 @@ async def bal(ctx, member: discord.Member = None):
 
 @bot.command()
 async def send(ctx, member: discord.Member, amount: int):
+    """Send other users GlumboCoin! E.g .send @<USER> 100""" 
     user_id = ctx.message.author.id
     await acc_check(user_id)
 
@@ -80,6 +82,7 @@ async def send(ctx, member: discord.Member, amount: int):
 
 @bot.command()
 async def websurf(ctx):
+    """Surf the web to earn GlumboCoin! E.g .websurf""" 
     user_id = ctx.message.author.id
     await acc_check(user_id)
 
