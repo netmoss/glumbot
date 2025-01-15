@@ -58,6 +58,21 @@ async def bal(ctx, member: discord.Member = None):
     await ctx.reply(f"<@{user_id}>'s balance is: **{balance} GlumboCoin**")
 
 @bot.command()
+async def baltop(ctx):
+    user_id = ctx.message.author.id
+    await acc_check(user_id)
+
+    cur.execute("SELECT * FROM users ORDER BY balance DESC LIMIT 10;")
+    top_users = cur.fetchall()
+
+    embed = discord.Embed(title="The GlumboCorp One Percent ", color=0x800080)
+    for idx, user in enumerate(top_users, start=1):
+        user_name = await bot.fetch_user(user[0])
+        embed.add_field(name=f"{idx}. {user_name}", value=f"**{user[2]} GlumboCoin**", inline=False)
+
+    await ctx.reply(embed=embed)
+
+@bot.command()
 async def send(ctx, member: discord.Member, amount: int):
     """Send other users GlumboCoin! E.g .send @<USER> 100""" 
     user_id = ctx.message.author.id
@@ -79,8 +94,6 @@ async def send(ctx, member: discord.Member, amount: int):
     else:
         await ctx.reply("Insufficient GlumboCoin!")
 
-
-
 @bot.command()
 async def eat(ctx, amount: int):
     """Eat your GlumboCoin! E.g .eat 10""" 
@@ -93,7 +106,10 @@ async def eat(ctx, amount: int):
     if balance >= amount:
         cur.execute("UPDATE users SET balance = balance - ? WHERE user_id = ?;", (amount, user_id))
         con.commit()
-        await ctx.reply(f"Ate **{amount} GlumboCoin!** \n (っ´ཀ`)っ")
+        if amount < 1000:
+            await ctx.reply(f"Ate **{amount} GlumboCoin!** \n (っ´ཀ`)っ \n ")
+        else:
+            await ctx.reply(f"Urgghh... ate **{amount} GlumboCoin**... :nauseated_face: \n https://i.imgur.com/I8JmRzN.gif")
 
     else:
         await ctx.reply("You don't have that many GlumboCoin!")
@@ -130,7 +146,7 @@ async def websurf(ctx):
 
         await asyncio.sleep(7)
 
-        embed.description = f"Surfed the web and found **{rand_int}** GlumboCoins!"
+        embed.description = f"Surfed the web and found **{rand_int} GlumboCoins!**"
 
         embed.set_image(url=None)
         await msg.edit(embed=embed)
