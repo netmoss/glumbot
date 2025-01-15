@@ -3,3 +3,6 @@ This is a bot for the GlumboCorp Discord server. It lets users earn and share Gl
 
 ## Commands
 Type .help to view all commands
+
+## Database
+An empty sample SQLITE database has been included for your convenice. 
