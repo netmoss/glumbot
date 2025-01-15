@@ -79,8 +79,27 @@ async def send(ctx, member: discord.Member, amount: int):
     else:
         await ctx.reply("Insufficient GlumboCoin!")
 
-user_locks = {}
 
+
+@bot.command()
+async def eat(ctx, amount: int):
+    """Eat your GlumboCoin! E.g .eat 10""" 
+    user_id = ctx.message.author.id
+    await acc_check(user_id)
+
+    cur.execute("SELECT balance FROM users WHERE user_id = ?;", (user_id,))
+    balance = cur.fetchone()[0]
+
+    if balance >= amount:
+        cur.execute("UPDATE users SET balance = balance - ? WHERE user_id = ?;", (amount, user_id))
+        con.commit()
+        await ctx.reply(f"Ate **{amount} GlumboCoin!** \n (っ´ཀ`)っ")
+
+    else:
+        await ctx.reply("You don't have that many GlumboCoin!")
+
+
+user_locks = {}
 @bot.command()
 async def websurf(ctx):
     """Surf the web to earn GlumboCoin! E.g .websurf""" 
@@ -90,7 +109,7 @@ async def websurf(ctx):
     if user_id in user_locks and user_locks[user_id]:
         await ctx.reply("You're already surfing the web! Please wait for the current process to finish.")
         return
-    
+
     user_locks[user_id] = True
 
     curr_time = int(time.time())
@@ -98,24 +117,31 @@ async def websurf(ctx):
     cur.execute("SELECT time_of_last_tx FROM users WHERE user_id = ?;", (user_id,))
     last_time = cur.fetchone()[0]
 
-    rand_int = random.randint(20, 100)
+    rand_int = random.randint(10, 50)
 
     if (curr_time - last_time) >= 1800:
-        await ctx.reply("Surfing the web for GlumboCoins! \n https://tenor.com/view/surf-internet-gif-11385820")
-        cur.execute("UPDATE users SET time_of_last_tx = ? WHERE user_id = ?;", (curr_time, user_id))
-        con.commit()
+        embed = discord.Embed(
+            title="Surfing the web for GlumboCoins...",
+            color=discord.Color.purple()
+        )
+        embed.set_image(url="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExZzFzdmQ5YXl6ZjJiMXNvOGx4ZXE5amxzeHBqbmxpdnI3dmI0ajE1NiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QWkuGmMgphvmE/giphy.gif")
 
-        msg = await ctx.send("# .")
-        for i in range(1, 6):
-            await asyncio.sleep(1)
-            await msg.edit(content= "# " + ("." * i))
-        await ctx.reply(f"Surfed the web and found **{rand_int}** GlumboCoins!")
+        msg = await ctx.send(embed=embed)
+
+        await asyncio.sleep(7)
+
+        embed.description = f"Surfed the web and found **{rand_int}** GlumboCoins!"
+
+        embed.set_image(url=None)
+        await msg.edit(embed=embed)
+
         cur.execute("UPDATE users SET balance = balance + ?, time_of_last_tx = ? WHERE user_id = ?;", (rand_int, curr_time, user_id))
         con.commit()
+
     else:
         await ctx.reply(f"Please wait another {1800 - (curr_time - last_time)} seconds!")
 
-    user_locks[user_id] = False
 
+    user_locks[user_id] = False
 token = os.getenv("DISCORD_TOKEN")
 bot.run(token)
