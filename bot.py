@@ -59,6 +59,7 @@ async def bal(ctx, member: discord.Member = None):
 
 @bot.command()
 async def baltop(ctx):
+    """Find the rich and eat them! E.g .baltop""" 
     user_id = ctx.message.author.id
     await acc_check(user_id)
 
@@ -75,7 +76,6 @@ async def baltop(ctx):
 @bot.command()
 async def send(ctx, member: discord.Member, amount: int):
     """Send other users GlumboCoin! E.g .send @<USER> 100""" 
-
     if amount < 0:
         await ctx.reply("https://media1.tenor.com/m/mGEW9U82igcAAAAd/gus-fring-gustavo.gif")
         return
