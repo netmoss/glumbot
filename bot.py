@@ -29,10 +29,11 @@ async def on_ready():
     print('------')
 
 async def log_transaction(user_id_1:int, user_id_2:int, amount:int):
-    timestamp = int(time.time())
-    transaction_id = f"{user_id_1 + user_id_2 + timestamp}"
-    cur.execute("INSERT INTO transactions (transaction_id, user_id_1, user_id_2, amount, timestamp) VALUES (?, ?, ?, ?, ?);", (transaction_id, user_id_1, user_id_2, amount, timestamp))
-    con.commit()
+    if user_id_1 != user_id_2:
+        timestamp = int(time.time())
+        transaction_id = f"{str(user_id_1) + str(user_id_2) + str(timestamp)}"
+        cur.execute("INSERT INTO transactions (transaction_id, user_id_1, user_id_2, amount, timestamp) VALUES (?, ?, ?, ?, ?);", (transaction_id, user_id_1, user_id_2, amount, timestamp))
+        con.commit()
 
 async def acc_check(user_id: int):
     timestamp = int(time.time()) - 1800
@@ -59,7 +60,6 @@ async def bal(ctx, member: discord.Member = None):
 
 @bot.command()
 async def baltop(ctx):
-    """Find the rich and eat them! E.g .baltop""" 
     user_id = ctx.message.author.id
     await acc_check(user_id)
 
@@ -76,8 +76,9 @@ async def baltop(ctx):
 @bot.command()
 async def send(ctx, member: discord.Member, amount: int):
     """Send other users GlumboCoin! E.g .send @<USER> 100""" 
+
     if amount < 0:
-        await ctx.reply("https://media1.tenor.com/m/mGEW9U82igcAAAAd/gus-fring-gustavo.gif")
+        await ctx.reply("https://tenor.com/view/gus-fring-gustavo-breaking-bad-stare-eyeing-gif-16275096")
         return
 
     user_id = ctx.message.author.id
@@ -104,7 +105,7 @@ async def eat(ctx, amount: int):
     """Eat your GlumboCoin! E.g .eat 10""" 
 
     if amount < 0:
-        await ctx.reply("https://media1.tenor.com/m/mGEW9U82igcAAAAd/gus-fring-gustavo.gif")
+        await ctx.reply("https://tenor.com/view/gus-fring-gustavo-breaking-bad-stare-eyeing-gif-16275096")
         return
 
     user_id = ctx.message.author.id
